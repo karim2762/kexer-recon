@@ -80,6 +80,12 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/results")
+def results():
+    username = request.args.get("username")
+    return render_template("results.html", username=username)
+
+
 @app.route("/scan")
 def run_scan():
     username = request.args.get("username")
@@ -89,7 +95,11 @@ def run_scan():
         "Connection": "keep-alive"
     }
 
-    return Response(scan(username), headers=headers_stream, mimetype="text/event-stream")
+    return Response(
+        scan(username),
+        headers=headers_stream,
+        mimetype="text/event-stream"
+    )
 
 
 if __name__ == "__main__":
