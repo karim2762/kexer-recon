@@ -82,13 +82,15 @@ const username = urlParams.get("username");
 const terminal = document.getElementById("terminal");
 const progress = document.getElementById("progress");
 
-let totalSites = 0;
+let scanned = 0;
+const estimatedSites = 50; // adjust to your backend count
 
 const eventSource = new EventSource("/scan?username=" + username);
 
 eventSource.onmessage = function(event){
 
 const data = JSON.parse(event.data);
+scanned++;
 
 const line = document.createElement("div");
 line.classList.add("line");
@@ -108,20 +110,20 @@ line.classList.add("error");
 }
 
 terminal.appendChild(line);
+
+/* FIXED scroll bug */
 terminal.scrollTop = terminal.scrollHeight;
 
-if (data.total) {
-totalSites = data.total;
-}
-
-let percent = (data.scanned / totalSites) * 100;
+/* Better progress calculation */
+let percent = Math.min((scanned / estimatedSites) * 100, 100);
 progress.style.width = percent + "%";
 
 };
 
+/* Connection error handling */
 eventSource.onerror = function(){
 const line = document.createElement("div");
-line.textContent = "[!] Scan finished";
+line.textContent = "[!] Scan connection closed";
 line.classList.add("error");
 terminal.appendChild(line);
 eventSource.close();
