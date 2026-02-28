@@ -2,48 +2,65 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Scanning...</title>
+<title>Live Scan | Kexer</title>
 
 <style>
-body {
-    background: #020617;
-    color: #00ff9c;
-    font-family: monospace;
-    padding: 40px;
+
+body{
+background:#020617;
+color:#00ff9c;
+font-family:monospace;
+padding:30px;
 }
 
-h1 {
-    text-align: center;
-    text-shadow: 0 0 15px #00ff9c;
+h1{
+text-align:center;
+margin-bottom:20px;
+text-shadow:0 0 15px #00ff9c;
 }
 
-.terminal {
-    background: black;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 25px #00ff9c;
-    height: 500px;
-    overflow-y: auto;
+.terminal{
+background:black;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 25px #00ff9c30;
+height:500px;
+overflow-y:auto;
 }
 
-.line {
-    margin: 5px 0;
+.line{
+margin:6px 0;
+word-break:break-all;
 }
 
-.found {
-    color: #22c55e;
+.found{
+color:#22c55e;
 }
 
-.notfound {
-    color: #ef4444;
+.notfound{
+color:#ef4444;
 }
 
-.progress-bar {
-    height: 8px;
-    background: #00ff9c;
-    width: 0%;
-    transition: width 0.3s;
+.error{
+color:#facc15;
 }
+
+.progress-container{
+width:100%;
+background:#001a12;
+height:8px;
+border-radius:10px;
+margin-bottom:15px;
+overflow:hidden;
+}
+
+.progress-bar{
+height:100%;
+background:#00ff9c;
+width:0%;
+transition:width .3s;
+}
+
 </style>
 </head>
 
@@ -51,45 +68,67 @@ h1 {
 
 <h1>Live OSINT Scan</h1>
 
+<div class="progress-container">
 <div class="progress-bar" id="progress"></div>
+</div>
 
 <div class="terminal" id="terminal"></div>
 
 <script>
+
 const urlParams = new URLSearchParams(window.location.search);
 const username = urlParams.get("username");
 
 const terminal = document.getElementById("terminal");
 const progress = document.getElementById("progress");
 
-let total = 0;
 let scanned = 0;
+const estimatedSites = 50; // adjust to your backend count
 
 const eventSource = new EventSource("/scan?username=" + username);
 
-eventSource.onmessage = function(event) {
-    const data = JSON.parse(event.data);
+eventSource.onmessage = function(event){
 
-    scanned++;
+const data = JSON.parse(event.data);
+scanned++;
 
-    const line = document.createElement("div");
-    line.classList.add("line");
+const line = document.createElement("div");
+line.classList.add("line");
 
-    if (data.status === "found") {
-        line.innerHTML = "[+] FOUND → " + data.site + " : <a href='" + data.url + "' target='_blank'>" + data.url + "</a>";
-        line.classList.add("found");
-    } else if (data.status === "not_found") {
-        line.textContent = "[-] NOT FOUND → " + data.site;
-        line.classList.add("notfound");
-    } else {
-        line.textContent = "[!] ERROR → " + data.site;
-    }
+if(data.status === "found"){
+line.innerHTML = "[+] FOUND → " + data.site +
+" : <a href='"+data.url+"' target='_blank'>"+data.url+"</a>";
+line.classList.add("found");
+}
+else if(data.status === "not_found"){
+line.textContent = "[-] NOT FOUND → " + data.site;
+line.classList.add("notfound");
+}
+else{
+line.textContent = "[!] ERROR → " + data.site;
+line.classList.add("error");
+}
 
-    terminal.appendChild(line);
-    terminal.scrollTop = terminal.scrollHeight;
+terminal.appendChild(line);
 
-    progress.style.width = (scanned * 2) + "%";
+/* FIXED scroll bug */
+terminal.scrollTop = terminal.scrollHeight;
+
+/* Better progress calculation */
+let percent = Math.min((scanned / estimatedSites) * 100, 100);
+progress.style.width = percent + "%";
+
 };
+
+/* Connection error handling */
+eventSource.onerror = function(){
+const line = document.createElement("div");
+line.textContent = "[!] Scan connection closed";
+line.classList.add("error");
+terminal.appendChild(line);
+eventSource.close();
+};
+
 </script>
 
 </body>

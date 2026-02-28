@@ -1,71 +1,176 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kexer OSINT Scanner</title>
 
 <style>
-body {
-    background: #020617;
-    color: #00ff9c;
-    font-family: monospace;
-    text-align: center;
-    padding-top: 100px;
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
 }
 
-h1 {
-    font-size: 40px;
-    text-shadow: 0 0 15px #00ff9c;
+body{
+background: radial-gradient(circle at top,#04131c,#020617);
+font-family: monospace;
+color:#00ff9c;
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
-input {
-    padding: 12px;
-    width: 280px;
-    background: black;
-    border: 1px solid #00ff9c;
-    color: #00ff9c;
+/* Card */
+.container{
+width:90%;
+max-width:380px;
+background:rgba(0,0,0,0.6);
+border:1px solid #00ff9c;
+border-radius:14px;
+padding:35px 25px;
+text-align:center;
+box-shadow:0 0 25px #00ff9c30;
+animation:fadeIn 1s ease;
 }
 
-button {
-    padding: 12px 25px;
-    background: #00ff9c;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
+@keyframes fadeIn{
+from{opacity:0; transform:translateY(20px);}
+to{opacity:1; transform:translateY(0);}
 }
 
-.scan-box {
-    margin-top: 40px;
+/* Title */
+h1{
+font-size:24px;
+margin-bottom:25px;
+text-shadow:0 0 12px #00ff9c;
+letter-spacing:2px;
 }
 
-.loader {
-    margin-top: 20px;
-    display: none;
+/* Input */
+input{
+width:100%;
+padding:12px;
+background:#000;
+border:1px solid #00ff9c;
+color:#00ff9c;
+border-radius:6px;
+outline:none;
+transition:.3s;
+margin-bottom:15px;
 }
+
+input:focus{
+box-shadow:0 0 15px #00ff9c;
+}
+
+/* Button */
+button{
+width:100%;
+padding:12px;
+background:#00ff9c;
+border:none;
+font-weight:bold;
+border-radius:6px;
+cursor:pointer;
+transition:.3s;
+}
+
+button:hover{
+box-shadow:0 0 18px #00ff9c;
+transform:translateY(-1px);
+}
+
+/* Loader */
+.loader{
+display:none;
+margin-top:20px;
+font-size:13px;
+}
+
+.progress{
+width:100%;
+height:6px;
+background:#001a12;
+border-radius:10px;
+overflow:hidden;
+margin-top:10px;
+}
+
+.progress-bar{
+height:100%;
+width:0%;
+background:#00ff9c;
+animation:scan 2s linear infinite;
+}
+
+@keyframes scan{
+0%{width:0}
+50%{width:100%}
+100%{width:0}
+}
+
+.footer{
+margin-top:20px;
+font-size:11px;
+opacity:.6;
+}
+
 </style>
 </head>
 
 <body>
 
-<h1>KEXER OSINT USER RECON</h1>
+<div class="container">
 
-<div class="scan-box">
-    <input id="username" placeholder="Enter username">
-    <button onclick="startScan()">Start Scan</button>
-</div>
+<h1>KEXER OSINT SCANNER</h1>
+
+<input id="username" placeholder="Enter target username">
+
+<button onclick="startScan()">Start Scan</button>
 
 <div class="loader" id="loader">
-Scanning targets...
+Scanning social networks...
+<div class="progress">
+<div class="progress-bar"></div>
+</div>
+</div>
+
+<div class="footer">
+Kexer Intelligence System
+</div>
+
 </div>
 
 <script>
-function startScan() {
-    const username = document.getElementById("username").value;
 
-    if (!username) return;
+const input = document.getElementById("username");
 
-    window.location = "/results?username=" + username;
+input.addEventListener("keypress", function(e){
+if(e.key === "Enter"){
+startScan();
 }
+});
+
+function startScan(){
+const username = input.value.trim();
+const loader = document.getElementById("loader");
+
+if(!username){
+alert("Enter a username first");
+input.focus();
+return;
+}
+
+loader.style.display = "block";
+
+setTimeout(()=>{
+window.location.href="/results?username="+encodeURIComponent(username);
+},2200);
+}
+
 </script>
 
 </body>
