@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Kexer OSINT Scanner</title>
+
+<style>
+body {
+    background: #020617;
+    color: #00ff9c;
+    font-family: monospace;
+    text-align: center;
+    padding-top: 100px;
+}
+
+h1 {
+    font-size: 40px;
+    text-shadow: 0 0 15px #00ff9c;
+}
+
+input {
+    padding: 12px;
+    width: 280px;
+    background: black;
+    border: 1px solid #00ff9c;
+    color: #00ff9c;
+}
+
+button {
+    padding: 12px 25px;
+    background: #00ff9c;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.scan-box {
+    margin-top: 40px;
+}
+
+.loader {
+    margin-top: 20px;
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<h1>KEXER OSINT USER RECON</h1>
+
+<div class="scan-box">
+    <input id="username" placeholder="Enter username">
+    <button onclick="startScan()">Start Scan</button>
+</div>
+
+<div class="loader" id="loader">
+Scanning targets...
+</div>
+
+<script>
+function startScan() {
+    const username = document.getElementById("username").value;
+
+    if (!username) return;
+
+    window.location = "/results.html?username=" + username;
+}
+</script>
+
+</body>
+</html>
