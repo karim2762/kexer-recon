@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Scanning...</title>
+
+<style>
+body {
+    background: #020617;
+    color: #00ff9c;
+    font-family: monospace;
+    padding: 40px;
+}
+
+h1 {
+    text-align: center;
+    text-shadow: 0 0 15px #00ff9c;
+}
+
+.terminal {
+    background: black;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 25px #00ff9c;
+    height: 500px;
+    overflow-y: auto;
+}
+
+.line {
+    margin: 5px 0;
+}
+
+.found {
+    color: #22c55e;
+}
+
+.notfound {
+    color: #ef4444;
+}
+
+.progress-bar {
+    height: 8px;
+    background: #00ff9c;
+    width: 0%;
+    transition: width 0.3s;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Live OSINT Scan</h1>
+
+<div class="progress-bar" id="progress"></div>
+
+<div class="terminal" id="terminal"></div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const username = urlParams.get("username");
+
+const terminal = document.getElementById("terminal");
+const progress = document.getElementById("progress");
+
+let total = 0;
+let scanned = 0;
+
+const eventSource = new EventSource("/scan?username=" + username);
+
+eventSource.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+
+    scanned++;
+
+    const line = document.createElement("div");
+    line.classList.add("line");
+
+    if (data.status === "found") {
+        line.innerHTML = "[+] FOUND → " + data.site + " : <a href='" + data.url + "' target='_blank'>" + data.url + "</a>";
+        line.classList.add("found");
+    } else if (data.status === "not_found") {
+        line.textContent = "[-] NOT FOUND → " + data.site;
+        line.classList.add("notfound");
+    } else {
+        line.textContent = "[!] ERROR → " + data.site;
+    }
+
+    terminal.appendChild(line);
+    terminal.scrollTop = terminal.scrollHeight;
+
+    progress.style.width = (scanned * 2) + "%";
+};
+</script>
+
+</body>
+</html>
